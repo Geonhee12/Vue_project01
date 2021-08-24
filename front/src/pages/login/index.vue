@@ -34,8 +34,8 @@ export default {
             email: this.form.email,
             password: this.form.password})
 
-            this.$router.push({path:'/'})
-
+            this.$router.push({path:'/post'})
+            
           }
           
 

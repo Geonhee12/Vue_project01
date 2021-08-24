@@ -120,6 +120,7 @@ app.post("/login", async (req, res) => {
             .catch((err) => res.json({ loginSuccess: false, err }));
     })
 });
+
 mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.3n1ev.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`).then(() => {
     app.listen(3000, () => {
         console.log(`listing to port ${PORT}`);
