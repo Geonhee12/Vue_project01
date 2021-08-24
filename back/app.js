@@ -10,7 +10,7 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 app.use('/', (req,res, next)=>{
-    console.log(`allowed cors : ${req.originalUrl}`);
+    // console.log(`allowed cors : ${req.originalUrl}`);
     // res.set('Access-Control-Allow-Origin','http://localhost:8080')        
     res.set('Access-Control-Allow-Origin','*'); //cors 전체 허용
     res.set('Access-Control-Allow-Methods', '*');
@@ -84,10 +84,46 @@ app.use((error, req, res, next) =>{
         message, data
     })
 })
+app.post("/login", async (req, res) => {
 
+    User.findOne({ email: req.body.email }, (err, user) => {
+        if(err){
+            return res.json({
+                loginSuccess : false,
+                message: "Id does not found"
+            });
+        }
+        user
+            .comparePass(req.body.password)
+            .then((isMatch) => {
+                if (!isMatch) {
+                    return res.json({
+                        loginSuccess: false,
+                        message: "password does not found"
+                    });
+                }
+                
+                user
+                    .generateToken()
+                    .then((user) => {
+                        res
+                        .cookie("x_auth", user.token)
+                        .status(200)
+                        .json({loginSuccess: true, userId: user._id });
+
+                    })
+                    .catch((err) =>{
+                        res.status(400).send(err);
+     
+                    });
+            })
+            .catch((err) => res.json({ loginSuccess: false, err }));
+    })
+});
 mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.3n1ev.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`).then(() => {
     app.listen(3000, () => {
         console.log(`listing to port ${PORT}`);
+
     });
 
 }).catch(err => console.log(err));
